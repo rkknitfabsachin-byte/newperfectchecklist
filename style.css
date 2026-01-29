@@ -1,7 +1,14 @@
+:root {
+  --bg: #0f241a;
+  --card: rgba(25, 70, 45, 0.6);
+  --text: #e8fff1;
+}
+
 body {
+  margin: 0;
   font-family: system-ui;
-  background: #0e1f17;
-  color: #eafff3;
+  background: var(--bg);
+  color: var(--text);
 }
 
 header {
@@ -10,9 +17,27 @@ header {
   padding: 1rem;
 }
 
+.toggle {
+  display: flex;
+  justify-content: center;
+  gap: .5rem;
+}
+
+button {
+  background: #1f5c3a;
+  border: none;
+  color: white;
+  padding: .5rem 1rem;
+  border-radius: 20px;
+}
+
 .card {
-  background: rgba(20,60,40,.6);
+  background: var(--card);
   margin: 1rem;
   padding: 1rem;
-  border-radius: 14px;
+  border-radius: 16px;
+}
+
+.hidden {
+  display: none;
 }
