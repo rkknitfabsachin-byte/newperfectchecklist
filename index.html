@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Work Space</title>
+  <meta charset="UTF-8">
+  <title>Rainforest Work App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h2 id="username"></h2>
-  <button id="themeToggle">🌗</button>
+  <h3 id="username"></h3>
+  <button onclick="toggleTheme()">🌗</button>
 </header>
 
 <section class="toggle">
@@ -18,6 +19,8 @@
 </section>
 
 <section id="tasks"></section>
+
+<section id="adminStats" class="hidden"></section>
 
 <script src="app.js"></script>
 </body>
