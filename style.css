@@ -1,0 +1,18 @@
+body {
+  font-family: system-ui;
+  background: #0e1f17;
+  color: #eafff3;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.card {
+  background: rgba(20,60,40,.6);
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 14px;
+}
