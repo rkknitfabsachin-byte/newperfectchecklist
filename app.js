@@ -31,7 +31,7 @@ async function loadTasks(mode) {
         <p>Status: ${t.status}</p>
         ${
           t.status !== "Done" && currentUser.role === "doer"
-            ? `<button onclick="markDone('${t.source}','${t.task}')">✔ Done</button>`
+            ? `<button onclick="markDone('${t.source}', ${t.row})">✔ Done</button>`
             : ""
         }
       </div>
@@ -39,18 +39,20 @@ async function loadTasks(mode) {
   });
 }
 
-async function markDone(source, task) {
+async function markDone(source, row) {
   await fetch(API, {
     method: "POST",
     body: JSON.stringify({
       action: "markDone",
       token,
       source,
-      task
+      row
     })
   });
+
   loadTasks("today");
 }
+
 
 async function loadAdminStats() {
   const data = await fetch(
@@ -79,5 +81,6 @@ async function loadAdminStats() {
 function toggleTheme() {
   document.body.classList.toggle("light");
 }
+
 
 init();
