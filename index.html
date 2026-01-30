@@ -2,36 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Work</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>RK Knit Fab · Work</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <!-- TOP BAR -->
 <header class="top">
-  <span id="username">Loading…</span>
-  <button class="icon" onclick="toggleTheme()">🌗</button>
+  <div>
+    <div class="brand">RK Knit Fab</div>
+    <div id="subtitle" class="sub">Tasks</div>
+  </div>
+
+  <div class="top-actions">
+    <button class="icon" onclick="switchView('tasks')">📝</button>
+    <button class="icon" onclick="switchView('space')">📁</button>
+  </div>
 </header>
 
-<!-- MODE SWITCH -->
-<div class="mode">
+<!-- TASK CONTROLS -->
+<div id="taskControls" class="mode">
   <button data-mode="past" onclick="switchMode(this)">◀</button>
   <button data-mode="today" class="active" onclick="switchMode(this)">Today</button>
   <button data-mode="future" onclick="switchMode(this)">▶</button>
 </div>
 
-<!-- TASK LIST -->
-<div id="tasks" class="list"></div>
+<!-- TASKS VIEW -->
+<section id="tasksView" class="list"></section>
 
-<!-- DIVIDER -->
-<div class="divider">My Space</div>
+<!-- MY SPACE VIEW -->
+<section id="spaceView" class="list hidden"></section>
 
-<!-- MY SPACE LIST -->
-<div id="myspace" class="list"></div>
-
-<!-- FLOATING ACTION BUTTON -->
-<button class="fab" onclick="addQuick()">＋</button>
+<!-- FLOATING ACTION -->
+<button id="fab" class="fab" onclick="fabAction()">＋</button>
 
 <script src="app.js"></script>
 </body>
