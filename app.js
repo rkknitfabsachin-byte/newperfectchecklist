@@ -47,24 +47,27 @@ function switchView(v){
 /* TASKS */
 async function loadTasks(){
   dateLabel.innerText = currentDate.toDateString();
+
   const res = await fetch(
     `${API}?action=tasks&token=${token}&date=${currentDate.toISOString()}`
   );
   const {tasks:list} = await res.json();
-  tasks.innerHTML="";
 
-  if(!list.length){
-    tasks.innerHTML=`<div class="empty">
-      Aaj ka kaam complete 🎉<br>Thoda relax kar lo 🌿
+  tasks.innerHTML = "";
+
+  if (!list.length) {
+    tasks.innerHTML = `<div class="empty">
+      Aaj ka kaam complete 🎉
     </div>`;
     return;
   }
 
-  const frag=document.createDocumentFragment();
+  const frag = document.createDocumentFragment();
+
   list.forEach(t=>{
-    const c=document.createElement("div");
-    c.className="chip";
-    c.innerHTML=`
+    const c = document.createElement("div");
+    c.className = "chip";
+    c.innerHTML = `
       <span class="dot ${t.source}"></span>
       <span style="flex:1">${t.task}</span>
       <button class="done-btn"
@@ -72,6 +75,7 @@ async function loadTasks(){
     `;
     frag.appendChild(c);
   });
+
   tasks.appendChild(frag);
 }
 
