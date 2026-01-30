@@ -1,30 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Work Library</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header>
-  <span id="username"></span>
-  <button onclick="toggleTheme()">🌗</button>
+<!-- TOP BAR -->
+<header class="top">
+  <span id="username">Loading…</span>
+  <button class="icon" onclick="toggleTheme()">🌗</button>
 </header>
 
-<nav class="tabs">
-  <button id="tabTasks" class="active" onclick="showTab('tasks')">Tasks</button>
-  <button id="tabMySpace" onclick="showTab('myspace')">My Space</button>
-</nav>
+<!-- MODE SWITCH -->
+<div class="mode">
+  <button data-mode="past" onclick="switchMode(this)">◀</button>
+  <button data-mode="today" class="active" onclick="switchMode(this)">Today</button>
+  <button data-mode="future" onclick="switchMode(this)">▶</button>
+</div>
 
-<section class="toggle">
-  <button onclick="loadTasks('past')">◀ Past</button>
-  <button onclick="loadTasks('today')">Today</button>
-  <button onclick="loadTasks('future')">Future ▶</button>
-</section>
+<!-- TASK LIST -->
+<div id="tasks" class="list"></div>
 
-<section id="tasks"></section>
-<section id="myspace" class="hidden"></section>
+<!-- DIVIDER -->
+<div class="divider">My Space</div>
+
+<!-- MY SPACE LIST -->
+<div id="myspace" class="list"></div>
+
+<!-- FLOATING ACTION BUTTON -->
+<button class="fab" onclick="addQuick()">＋</button>
 
 <script src="app.js"></script>
 </body>
