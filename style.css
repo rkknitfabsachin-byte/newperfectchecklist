@@ -1,20 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
-
 :root {
-  --bg-dark: #0f1f17;
-  --bg-light: #eef4ee;
-  --paper: #fbfaf6;
-  --wood: #1f3d2b;
-  --accent: #6aa84f;
-  --text-dark: #1c2d24;
-  --text-light: #edf7f1;
+  --bg-dark: #0b0f0d;
+  --bg-light: #f6f7f6;
+  --text-dark: #0e1412;
+  --text-light: #e9f0ec;
+  --accent: #4ade80;
+  --muted: #6b7280;
 }
 
+/* BASE */
 body {
   margin: 0;
   font-family: system-ui, -apple-system;
   background: var(--bg-dark);
   color: var(--text-light);
+  -webkit-tap-highlight-color: transparent;
 }
 
 body.light {
@@ -22,82 +21,104 @@ body.light {
   color: var(--text-dark);
 }
 
-/* HEADER */
-header {
-  padding: 1rem;
+/* TOP BAR */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: .7rem 1rem;
   display: flex;
   justify-content: space-between;
-  font-weight: 600;
+  align-items: center;
+  backdrop-filter: blur(6px);
 }
 
-/* TABS */
-.tabs {
+/* MODE SWITCH */
+.mode {
   display: flex;
-  gap: .5rem;
-  padding: .5rem;
-}
-
-.tabs button {
-  flex: 1;
-  padding: .5rem;
-  border-radius: 999px;
-  border: none;
-  background: var(--wood);
-  color: white;
-}
-
-.tabs button.active {
-  background: var(--accent);
-  color: #143021;
-}
-
-/* TOGGLE */
-.toggle {
-  display: flex;
-  gap: .5rem;
-  padding: .5rem;
-}
-
-.toggle button {
-  flex: 1;
-  border-radius: 999px;
+  justify-content: center;
+  gap: .75rem;
   padding: .4rem;
 }
 
-/* CARD (BOOK PAGE) */
-.card {
-  background: var(--paper);
-  color: var(--text-dark);
-  margin: .75rem;
-  padding: 1rem;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.15);
-}
-
-.card h4 {
-  font-family: "Merriweather", serif;
-  margin: 0 0 .4rem;
-}
-
-.card button {
-  width: 100%;
-  margin-top: .6rem;
-  padding: .5rem;
-  border-radius: 10px;
-  background: var(--accent);
+.mode button {
+  background: none;
   border: none;
+  color: inherit;
+  opacity: .5;
+  font-size: .85rem;
+}
+
+.mode button.active {
+  opacity: 1;
   font-weight: 600;
 }
 
-/* INPUTS */
-input, select {
-  width: 100%;
-  padding: .5rem;
-  margin-top: .4rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+/* LIST */
+.list {
+  padding: .4rem .5rem;
 }
 
-.hidden {
-  display: none;
+/* CHIP */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .55rem .75rem;
+  margin-bottom: .35rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  font-size: .9rem;
+  animation: fadeIn .12s ease;
+}
+
+body.light .chip {
+  background: rgba(0,0,0,.05);
+}
+
+/* STATUS DOT */
+.dot {
+  width: .55rem;
+  height: .55rem;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.dot.done {
+  background: var(--accent);
+}
+
+/* INLINE BUTTON */
+.chip button {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: .9rem;
+}
+
+/* DIVIDER */
+.divider {
+  padding: .6rem 1rem .3rem;
+  font-size: .7rem;
+  opacity: .5;
+}
+
+/* FAB */
+.fab {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #043d25;
+  border: none;
+  font-size: 1.6rem;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
 }
