@@ -1,38 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>RK Knit Fab</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RK Knit Fab</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="top">
   <div>
     <div class="brand">RK Knit Fab</div>
-    <div id="subtitle" class="sub">Tasks</div>
+    <div id="dateLabel" class="sub"></div>
   </div>
-
   <div class="actions">
-    <div class="toggle" onclick="toggleTheme()">
-      <div class="knob"></div>
-    </div>
-    <button class="icon" onclick="switchView('tasks')">📝</button>
-    <button class="icon" onclick="switchView('space')">📁</button>
+    <div class="theme-toggle" onclick="toggleTheme()"><span></span></div>
+    <button class="icon" onclick="view('tasks')">📝</button>
+    <button class="icon" onclick="view('space')">📁</button>
   </div>
 </header>
 
-<div id="taskControls" class="mode">
-  <button data-mode="past" onclick="switchMode(this)">◀</button>
-  <button data-mode="today" class="active" onclick="switchMode(this)">Today</button>
-  <button data-mode="future" onclick="switchMode(this)">▶</button>
+<div class="nav">
+  <button onclick="moveDate(-1)">◀</button>
+  <button onclick="goToday()">Today</button>
+  <button onclick="moveDate(1)">▶</button>
 </div>
 
-<section id="tasksView" class="list"></section>
-<section id="spaceView" class="list hidden"></section>
+<section id="tasks"></section>
+<section id="space" class="hidden"></section>
 
-<button class="fab" onclick="fabAction()">＋</button>
+<button class="fab" onclick="addItem()">＋</button>
 
 <script src="app.js"></script>
 </body>
