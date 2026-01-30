@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>RK Knit Fab · Work</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>RK Knit Fab</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -14,32 +14,25 @@
     <div id="subtitle" class="sub">Tasks</div>
   </div>
 
-  <div class="top-actions">
-    <!-- Light / Dark toggle -->
-    <label class="theme-switch">
-      <input type="checkbox" onchange="toggleTheme(this)">
-      <span></span>
-    </label>
-
+  <div class="actions">
+    <div class="toggle" onclick="toggleTheme()">
+      <div class="knob"></div>
+    </div>
     <button class="icon" onclick="switchView('tasks')">📝</button>
     <button class="icon" onclick="switchView('space')">📁</button>
   </div>
 </header>
 
-<!-- TASK CONTROLS -->
 <div id="taskControls" class="mode">
   <button data-mode="past" onclick="switchMode(this)">◀</button>
   <button data-mode="today" class="active" onclick="switchMode(this)">Today</button>
   <button data-mode="future" onclick="switchMode(this)">▶</button>
 </div>
 
-<!-- TASKS -->
 <section id="tasksView" class="list"></section>
-
-<!-- MY SPACE -->
 <section id="spaceView" class="list hidden"></section>
 
-<button id="fab" class="fab" onclick="fabAction()">＋</button>
+<button class="fab" onclick="fabAction()">＋</button>
 
 <script src="app.js"></script>
 </body>
