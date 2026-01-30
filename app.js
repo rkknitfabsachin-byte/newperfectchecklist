@@ -2,14 +2,57 @@ const API = "https://newchecklist.rkknitfabsachin.workers.dev";
 const token = new URLSearchParams(location.search).get("token");
 
 let currentDate = new Date();
+let currentView = "tasks";
+
+/* ================= INIT ================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!token) {
+    showMessage("Access link invalid ❌");
+    return;
+  }
+  loadTasks();
+});
+
+/* ================= DATE NAV ================= */
+
+function moveDate(step) {
+  currentDate.setDate(currentDate.getDate() + step);
+  if (currentView === "tasks") loadTasks();
+}
+
+function goToday() {
+  currentDate = new Date();
+  if (currentView === "tasks") loadTasks();
+}
+
+/* ================= VIEW SWITCH ================= */
+
+function switchView(view) {
+  currentView = view;
+
+  const tasksEl = document.getElementById("tasks");
+  const spaceEl = document.getElementById("space");
+
+  if (view === "tasks") {
+    tasksEl.classList.remove("hidden");
+    spaceEl.classList.add("hidden");
+    loadTasks();
+  } else {
+    tasksEl.classList.add("hidden");
+    spaceEl.classList.remove("hidden");
+    loadSpace();
+  }
+}
 
 /* ================= LOAD TASKS ================= */
 
 async function loadTasks() {
-  if (!token) {
-    showMessage("Access token missing ❌");
-    return;
-  }
+  const container = document.getElementById("tasks");
+  const dateLabel = document.getElementById("dateLabel");
+
+  container.innerHTML = "";
+  dateLabel.innerText = currentDate.toDateString();
 
   const url = `${API}/tasks?token=${token}&date=${currentDate.toISOString()}`;
 
@@ -21,15 +64,14 @@ async function loadTasks() {
     try {
       data = JSON.parse(text);
     } catch {
-      console.error("Invalid JSON from API:", text);
+      console.error("Invalid JSON:", text);
       showMessage("Server error ❌");
       return;
     }
 
-    // 🔴 IMPORTANT FIX
     if (!Array.isArray(data)) {
-      console.error("API returned error:", data);
-      showMessage(data.error || "No data available");
+      console.error("API error:", data);
+      showMessage(data.error || "No tasks");
       return;
     }
 
@@ -41,17 +83,17 @@ async function loadTasks() {
   }
 }
 
-/* ================= RENDER ================= */
+/* ================= RENDER TASKS ================= */
 
-function renderTasks(tasks) {
-  const box = document.getElementById("tasks");
-  box.innerHTML = "";
+function renderTasks(list) {
+  const container = document.getElementById("tasks");
+  container.innerHTML = "";
 
-  if (tasks.length === 0) {
-    box.innerHTML = `
+  if (list.length === 0) {
+    container.innerHTML = `
       <div class="empty">
-        Aaj koi kaam nahi 😌<br>
-        Kal phir hustle 💪
+        Aaj ka kaam complete 🎉<br>
+        Thoda relax kar lo 😌
       </div>
     `;
     return;
@@ -59,7 +101,7 @@ function renderTasks(tasks) {
 
   const frag = document.createDocumentFragment();
 
-  tasks.forEach(t => {
+  list.forEach(t => {
     const div = document.createElement("div");
     div.className = "chip";
     div.innerHTML = `
@@ -69,28 +111,23 @@ function renderTasks(tasks) {
     frag.appendChild(div);
   });
 
-  box.appendChild(frag);
+  container.appendChild(frag);
 }
 
-/* ================= UI HELPERS ================= */
+/* ================= MY SPACE (SAFE PLACEHOLDER) ================= */
+
+function loadSpace() {
+  const space = document.getElementById("space");
+  space.innerHTML = `
+    <div class="empty">
+      My Space coming soon 📁
+    </div>
+  `;
+}
+
+/* ================= HELPERS ================= */
 
 function showMessage(msg) {
-  const box = document.getElementById("tasks");
-  box.innerHTML = `<div class="empty">${msg}</div>`;
+  document.getElementById("tasks").innerHTML =
+    `<div class="empty">${msg}</div>`;
 }
-
-/* ================= DATE NAV ================= */
-
-function nextDay() {
-  currentDate.setDate(currentDate.getDate() + 1);
-  loadTasks();
-}
-
-function prevDay() {
-  currentDate.setDate(currentDate.getDate() - 1);
-  loadTasks();
-}
-
-/* ================= INIT ================= */
-
-loadTasks();
