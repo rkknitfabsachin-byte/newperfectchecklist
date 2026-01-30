@@ -8,7 +8,6 @@
 </head>
 <body>
 
-<!-- TOP BAR -->
 <header class="top">
   <div>
     <div class="brand">RK Knit Fab</div>
@@ -16,6 +15,12 @@
   </div>
 
   <div class="top-actions">
+    <!-- Light / Dark toggle -->
+    <label class="theme-switch">
+      <input type="checkbox" onchange="toggleTheme(this)">
+      <span></span>
+    </label>
+
     <button class="icon" onclick="switchView('tasks')">📝</button>
     <button class="icon" onclick="switchView('space')">📁</button>
   </div>
@@ -28,13 +33,12 @@
   <button data-mode="future" onclick="switchMode(this)">▶</button>
 </div>
 
-<!-- TASKS VIEW -->
+<!-- TASKS -->
 <section id="tasksView" class="list"></section>
 
-<!-- MY SPACE VIEW -->
+<!-- MY SPACE -->
 <section id="spaceView" class="list hidden"></section>
 
-<!-- FLOATING ACTION -->
 <button id="fab" class="fab" onclick="fabAction()">＋</button>
 
 <script src="app.js"></script>
