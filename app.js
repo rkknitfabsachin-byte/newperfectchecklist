@@ -11,47 +11,41 @@ if(!token){
 
 init();
 
-/* ---------- INIT ---------- */
+/* INIT */
 async function init(){
   const me = await fetch(`${API}?action=me&token=${token}`).then(r=>r.json());
   if(me.error) return;
-
-  document.getElementById("subtitle").innerText = "Tasks";
   loadTasks("today");
 }
 
-/* ---------- VIEW SWITCH ---------- */
+/* VIEW SWITCH */
 function switchView(view){
   currentView = view;
-
-  document.getElementById("tasksView").classList.toggle("hidden", view !== "tasks");
-  document.getElementById("spaceView").classList.toggle("hidden", view !== "space");
-  document.getElementById("taskControls").classList.toggle("hidden", view !== "tasks");
-
-  document.getElementById("subtitle").innerText =
-    view === "tasks" ? "Tasks" : "My Space";
-
-  if(view === "space") loadMySpace();
+  tasksView.classList.toggle("hidden", view!=="tasks");
+  spaceView.classList.toggle("hidden", view!=="space");
+  taskControls.classList.toggle("hidden", view!=="tasks");
+  subtitle.innerText = view==="tasks" ? "Tasks" : "My Space";
+  if(view==="space") loadMySpace();
 }
 
-/* ---------- TASKS ---------- */
+/* MODE */
 function switchMode(btn){
   document.querySelectorAll(".mode button").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
   loadTasks(btn.dataset.mode);
 }
 
+/* TASKS */
 async function loadTasks(mode){
   currentMode = mode;
   const res = await fetch(
     `${API}?action=tasks&token=${token}&mode=${mode}&date=${new Date().toISOString()}`
   );
   const json = await res.json();
-  const box = document.getElementById("tasksView");
-  box.innerHTML = "";
+  tasksView.innerHTML = "";
 
-  if(!json.tasks || json.tasks.length === 0){
-    box.innerHTML = `
+  if(!json.tasks || json.tasks.length===0){
+    tasksView.innerHTML = `
       <div class="empty">
         Sab kaam complete 🎉<br>
         Aaj ka din productive raha 💪
@@ -60,36 +54,40 @@ async function loadTasks(mode){
   }
 
   json.tasks.forEach(t=>{
-    const chip = document.createElement("div");
+    const chip=document.createElement("div");
     chip.className="chip";
-    chip.innerHTML = `
+    chip.innerHTML=`
       <span class="dot ${t.source}"></span>
       <span style="flex:1">${t.task}</span>
-      <button onclick="done('${t.source}',${t.row})">Done</button>
+      <button onclick="done(this,'${t.source}',${t.row})">Done</button>
     `;
-    box.appendChild(chip);
+    tasksView.appendChild(chip);
   });
 }
 
-async function done(source,row){
-  await fetch(API,{
+/* DONE WITH ANIMATION */
+function done(btn,source,row){
+  const chip = btn.closest(".chip");
+  chip.classList.add("removing");
+
+  setTimeout(()=>chip.remove(),180);
+
+  fetch(API,{
     method:"POST",
     body:JSON.stringify({
       action:"markDone",
       token,source,row
     })
   });
-  loadTasks(currentMode);
 }
 
-/* ---------- MY SPACE ---------- */
+/* MY SPACE */
 async function loadMySpace(){
   const json = await fetch(`${API}?action=mySpace&token=${token}`).then(r=>r.json());
-  const box = document.getElementById("spaceView");
-  box.innerHTML="";
+  spaceView.innerHTML="";
 
   if(!json.items || json.items.length===0){
-    box.innerHTML = `
+    spaceView.innerHTML = `
       <div class="empty">
         Yeh aapki personal jagah hai 📁<br>
         Jo zaroori ho, yahin rakho.
@@ -103,25 +101,39 @@ async function loadMySpace(){
     chip.innerHTML=`
       <span class="dot space"></span>
       <span style="flex:1">${i.title}${i.value?` • ${i.value}`:""}</span>
-      <button onclick="remove(${i.row})">✕</button>
+      <button onclick="removeItem(this,${i.row})">✕</button>
     `;
-    box.appendChild(chip);
+    spaceView.appendChild(chip);
   });
 }
 
-/* ---------- FAB ---------- */
+/* REMOVE MY SPACE WITH ANIMATION */
+function removeItem(btn,row){
+  const chip = btn.closest(".chip");
+  chip.classList.add("removing");
+  setTimeout(()=>chip.remove(),180);
+
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"deleteMySpace",
+      token,row
+    })
+  });
+}
+
+/* FAB */
 function fabAction(){
-  if(currentView === "tasks"){
-    alert("System tasks sirf sheet se aate hain 🙂");
+  if(currentView==="tasks"){
+    alert("System tasks sheet se aate hain 🙂");
     return;
   }
 
-  const title = prompt("Title (file / habit / task)");
+  const title = prompt("Title");
   if(!title) return;
 
-  const time = prompt("Time (optional, eg 07:00 AM)");
-  const folder = prompt("Folder name (optional)");
-
+  const time = prompt("Time (optional)");
+  const folder = prompt("Folder (optional)");
   const finalTitle = folder ? `[${folder}] ${title}` : title;
 
   fetch(API,{
@@ -131,19 +143,12 @@ function fabAction(){
       token,
       type:"item",
       title:finalTitle,
-      value:time || ""
+      value:time||""
     })
   }).then(loadMySpace);
 }
 
-/* ---------- REMOVE ---------- */
-async function remove(row){
-  await fetch(API,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"deleteMySpace",
-      token,row
-    })
-  });
-  loadMySpace();
+/* THEME */
+function toggleTheme(el){
+  document.body.classList.toggle("light", el.checked);
 }
