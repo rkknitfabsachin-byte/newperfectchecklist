@@ -1,140 +1,139 @@
 const API = "https://script.google.com/macros/s/AKfycbxn6R1E7iaazqJfLw6Cyk1WT4AEhissMycTy9rJvBDZuEioNOheegG7itN1bJJYWhjS/exec";
 const token = new URLSearchParams(location.search).get("token");
 
-let currentMode = "today";
+let currentDate = new Date();
 let currentView = "tasks";
 
 if (!token) {
-  document.body.innerHTML = "<div class='empty'>Access link required</div>";
+  document.body.innerHTML = "Access link required";
   throw "";
 }
 
-init();
-
-async function init() {
-  loadTasks("today");
+/* THEME */
+if (localStorage.getItem("rk-theme")==="light") {
+  document.body.classList.add("light");
+}
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem(
+    "rk-theme",
+    document.body.classList.contains("light")?"light":"dark"
+  );
 }
 
-/* VIEW SWITCH */
-function switchView(view) {
-  currentView = view;
-  tasksView.classList.toggle("hidden", view !== "tasks");
-  spaceView.classList.toggle("hidden", view !== "space");
-  taskControls.classList.toggle("hidden", view !== "tasks");
-  subtitle.innerText = view === "tasks" ? "Tasks" : "My Space";
-  if (view === "space") loadMySpace();
+/* INIT */
+loadTasks();
+
+/* DATE NAV */
+function moveDate(d){
+  currentDate.setDate(currentDate.getDate()+d);
+  loadTasks();
+}
+function goToday(){
+  currentDate = new Date();
+  loadTasks();
 }
 
-/* MODE SWITCH */
-function switchMode(btn) {
-  document.querySelectorAll(".mode button").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  loadTasks(btn.dataset.mode);
+/* VIEW */
+function switchView(v){
+  currentView=v;
+  tasks.classList.toggle("hidden",v!=="tasks");
+  space.classList.toggle("hidden",v!=="space");
+  if(v==="space") loadSpace();
 }
 
-/* LOAD TASKS */
-async function loadTasks(mode) {
-  currentMode = mode;
+/* TASKS */
+async function loadTasks(){
+  dateLabel.innerText = currentDate.toDateString();
   const res = await fetch(
-    `${API}?action=tasks&token=${token}&mode=${mode}&date=${new Date().toISOString()}`
+    `${API}?action=tasks&token=${token}&date=${currentDate.toISOString()}`
   );
   const json = await res.json();
+  tasks.innerHTML="";
 
-  tasksView.innerHTML = "";
-
-  if (!json.tasks || json.tasks.length === 0) {
-    tasksView.innerHTML = `
-      <div class="empty">
-        Sab kaam complete 🎉<br>
-        Aaj ka din productive raha 💪
-      </div>`;
+  if(!json.tasks.length){
+    tasks.innerHTML=`<div style="text-align:center;opacity:.6">
+      Aaj koi kaam nahi 😌<br>Kal phir hustle 💪
+    </div>`;
     return;
   }
 
-  json.tasks.forEach(t => {
-    const chip = document.createElement("div");
-    chip.className = "chip";
-    chip.innerHTML = `
+  json.tasks.forEach(t=>{
+    const c=document.createElement("div");
+    c.className="chip";
+    c.innerHTML=`
       <span class="dot ${t.source}"></span>
       <span style="flex:1">${t.task}</span>
-      <button onclick="markDone(this,'${t.source}',${t.row})">Done</button>
+      <button onclick="done(this,'${t.source}',${t.row})">Done</button>
     `;
-    tasksView.appendChild(chip);
+    tasks.appendChild(c);
   });
 }
 
-/* DONE WITH ANIMATION */
-function markDone(btn, source, row) {
-  const chip = btn.closest(".chip");
+function done(btn,source,row){
+  const chip=btn.closest(".chip");
   chip.classList.add("removing");
-  setTimeout(() => chip.remove(), 180);
+  setTimeout(()=>chip.remove(),180);
 
-  fetch(API, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "markDone",
-      token, source, row
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"markDone",
+      token,source,row
     })
   });
 }
 
 /* MY SPACE */
-async function loadMySpace() {
-  const json = await fetch(`${API}?action=mySpace&token=${token}`).then(r => r.json());
-  spaceView.innerHTML = "";
+async function loadSpace(){
+  const json = await fetch(
+    `${API}?action=mySpace&token=${token}`
+  ).then(r=>r.json());
+  space.innerHTML="";
 
-  if (!json.items || json.items.length === 0) {
-    spaceView.innerHTML = `<div class="empty">Yeh aapki personal jagah hai 📁</div>`;
+  if(!json.items.length){
+    space.innerHTML=`<div style="text-align:center;opacity:.6">
+      Yeh tumhari jagah hai 📁
+    </div>`;
     return;
   }
 
-  json.items.forEach(i => {
-    const chip = document.createElement("div");
-    chip.className = "chip";
-    chip.innerHTML = `
+  json.items.forEach(i=>{
+    const c=document.createElement("div");
+    c.className="chip";
+    c.innerHTML=`
       <span class="dot space"></span>
-      <span style="flex:1">${i.title}${i.value ? " • " + i.value : ""}</span>
-      <button onclick="removeItem(this,${i.row})">✕</button>
+      <span style="flex:1">${i.title}${i.value?" • "+i.value:""}</span>
+      <button onclick="remove(this,${i.row})">✕</button>
     `;
-    spaceView.appendChild(chip);
+    space.appendChild(c);
   });
 }
 
-function removeItem(btn, row) {
-  const chip = btn.closest(".chip");
+function addItem(){
+  if(currentView!=="space") return alert("System tasks sheet se aate hain 🙂");
+  const t=prompt("Title");
+  if(!t) return;
+
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"addMySpace",
+      token,title:t
+    })
+  }).then(loadSpace);
+}
+
+function remove(btn,row){
+  const chip=btn.closest(".chip");
   chip.classList.add("removing");
-  setTimeout(() => chip.remove(), 180);
+  setTimeout(()=>chip.remove(),180);
 
-  fetch(API, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "deleteMySpace",
-      token, row
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"deleteMySpace",
+      token,row
     })
   });
-}
-
-/* FAB */
-function fabAction() {
-  if (currentView === "tasks") {
-    alert("System tasks sheet se aate hain 🙂");
-    return;
-  }
-
-  const title = prompt("Title");
-  if (!title) return;
-
-  fetch(API, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "addMySpace",
-      token,
-      title
-    })
-  }).then(loadMySpace);
-}
-
-/* THEME */
-function toggleTheme() {
-  document.body.classList.toggle("light");
 }
