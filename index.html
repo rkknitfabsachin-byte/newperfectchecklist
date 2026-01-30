@@ -8,26 +8,34 @@
 </head>
 <body>
 
-<header class="top">
-  <div>
+<header class="header">
+  <div class="left">
     <div class="brand">RK Knit Fab</div>
     <div id="dateLabel" class="sub"></div>
   </div>
-  <div class="actions">
-    <div class="theme-toggle" onclick="toggleTheme()"><span></span></div>
-    <button class="icon" onclick="view('tasks')">📝</button>
-    <button class="icon" onclick="view('space')">📁</button>
+
+  <div class="center">
+    <button onclick="moveDate(-1)">◀</button>
+    <button onclick="goToday()">Today</button>
+    <button onclick="moveDate(1)">▶</button>
+  </div>
+
+  <div class="right">
+    <div class="segmented">
+      <button id="tabTasks" class="active" onclick="switchView('tasks')">Tasks</button>
+      <button id="tabSpace" onclick="switchView('space')">My Space</button>
+    </div>
+
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span></span>
+    </div>
   </div>
 </header>
 
-<div class="nav">
-  <button onclick="moveDate(-1)">◀</button>
-  <button onclick="goToday()">Today</button>
-  <button onclick="moveDate(1)">▶</button>
-</div>
-
-<section id="tasks"></section>
-<section id="space" class="hidden"></section>
+<main>
+  <section id="tasks"></section>
+  <section id="space" class="hidden"></section>
+</main>
 
 <button class="fab" onclick="addItem()">＋</button>
 
