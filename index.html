@@ -2,25 +2,29 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Rainforest Work App</title>
+  <title>Work Library</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h3 id="username"></h3>
+  <span id="username"></span>
   <button onclick="toggleTheme()">🌗</button>
 </header>
 
+<nav class="tabs">
+  <button id="tabTasks" class="active" onclick="showTab('tasks')">Tasks</button>
+  <button id="tabMySpace" onclick="showTab('myspace')">My Space</button>
+</nav>
+
 <section class="toggle">
   <button onclick="loadTasks('past')">◀ Past</button>
-  <button onclick="loadTasks('today')">● Today</button>
+  <button onclick="loadTasks('today')">Today</button>
   <button onclick="loadTasks('future')">Future ▶</button>
 </section>
 
 <section id="tasks"></section>
-
-<section id="adminStats" class="hidden"></section>
+<section id="myspace" class="hidden"></section>
 
 <script src="app.js"></script>
 </body>
