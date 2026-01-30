@@ -1,8 +1,8 @@
 :root{
   --bg-dark:#0c1110;
   --bg-light:#f6f7f6;
-  --ink:#0e1412;
-  --text:#e9f0ec;
+  --text-dark:#0e1412;
+  --text-light:#e9f0ec;
   --accent:#2ecc71;
   --muted:#6b7280;
 }
@@ -11,7 +11,13 @@ body{
   margin:0;
   font-family:system-ui,-apple-system;
   background:var(--bg-dark);
-  color:var(--text);
+  color:var(--text-light);
+  transition:background .2s,color .2s;
+}
+
+body.light{
+  background:var(--bg-light);
+  color:var(--text-dark);
 }
 
 .hidden{display:none}
@@ -31,22 +37,57 @@ body{
 .brand{font-weight:700;font-size:.95rem}
 .sub{font-size:.75rem;opacity:.6}
 
-.top-actions button{
-  background:none;
-  border:none;
-  color:inherit;
-  font-size:1.2rem;
-  margin-left:.3rem;
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:.4rem;
 }
 
-/* MODE SWITCH */
+.icon{
+  background:none;
+  border:none;
+  font-size:1.2rem;
+  color:inherit;
+}
+
+/* THEME SWITCH */
+.theme-switch{
+  position:relative;
+  width:36px;
+  height:18px;
+}
+.theme-switch input{display:none}
+.theme-switch span{
+  position:absolute;
+  inset:0;
+  background:#999;
+  border-radius:999px;
+}
+.theme-switch span::after{
+  content:"";
+  position:absolute;
+  width:14px;
+  height:14px;
+  top:2px;
+  left:2px;
+  background:white;
+  border-radius:50%;
+  transition:transform .2s;
+}
+.theme-switch input:checked + span{
+  background:var(--accent);
+}
+.theme-switch input:checked + span::after{
+  transform:translateX(18px);
+}
+
+/* MODE */
 .mode{
   display:flex;
   justify-content:center;
   gap:.6rem;
   padding:.4rem;
 }
-
 .mode button{
   background:none;
   border:none;
@@ -71,9 +112,20 @@ body{
   border-radius:999px;
   background:rgba(255,255,255,.06);
   font-size:.9rem;
-  animation:fade .12s ease;
+  transition:transform .18s ease,opacity .18s ease;
 }
 
+body.light .chip{
+  background:rgba(0,0,0,.05);
+}
+
+/* REMOVE ANIMATION */
+.chip.removing{
+  opacity:0;
+  transform:translateX(40px);
+}
+
+/* DOTS */
 .dot{
   width:.55rem;
   height:.55rem;
@@ -85,13 +137,13 @@ body{
 .dot.space{background:var(--accent)}
 
 .chip button{
-  border:none;
   background:none;
+  border:none;
   color:var(--accent);
   font-size:.85rem;
 }
 
-/* EMPTY STATE */
+/* EMPTY */
 .empty{
   text-align:center;
   opacity:.6;
@@ -111,10 +163,4 @@ body{
   border:none;
   font-size:1.5rem;
   color:#06381f;
-}
-
-/* ANIM */
-@keyframes fade{
-  from{opacity:0;transform:translateY(4px)}
-  to{opacity:1;transform:none}
 }
