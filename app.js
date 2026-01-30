@@ -1,4 +1,4 @@
-const API = "https://script.google.com/macros/s/AKfycbxn6R1E7iaazqJfLw6Cyk1WT4AEhissMycTy9rJvBDZuEioNOheegG7itN1bJJYWhjS/exec";
+const API = "https://newchecklist.rkknitfabsachin.workers.dev";
 const token = new URLSearchParams(location.search).get("token");
 
 let currentDate = new Date();
