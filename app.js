@@ -24,10 +24,10 @@ function toggleTheme(){
 /* INIT */
 loadTasks();
 
-/* DATE NAV */
+/* DATE */
 function moveDate(d){
   currentDate.setDate(currentDate.getDate()+d);
-  loadTasks();
+  if(currentView==="tasks") loadTasks();
 }
 function goToday(){
   currentDate = new Date();
@@ -39,6 +39,8 @@ function switchView(v){
   currentView=v;
   tasks.classList.toggle("hidden",v!=="tasks");
   space.classList.toggle("hidden",v!=="space");
+  tabTasks.classList.toggle("active",v==="tasks");
+  tabSpace.classList.toggle("active",v==="space");
   if(v==="space") loadSpace();
 }
 
@@ -48,26 +50,29 @@ async function loadTasks(){
   const res = await fetch(
     `${API}?action=tasks&token=${token}&date=${currentDate.toISOString()}`
   );
-  const json = await res.json();
+  const {tasks:list} = await res.json();
   tasks.innerHTML="";
 
-  if(!json.tasks.length){
-    tasks.innerHTML=`<div style="text-align:center;opacity:.6">
-      Aaj koi kaam nahi 😌<br>Kal phir hustle 💪
+  if(!list.length){
+    tasks.innerHTML=`<div class="empty">
+      Aaj ka kaam complete 🎉<br>Thoda relax kar lo 🌿
     </div>`;
     return;
   }
 
-  json.tasks.forEach(t=>{
+  const frag=document.createDocumentFragment();
+  list.forEach(t=>{
     const c=document.createElement("div");
     c.className="chip";
     c.innerHTML=`
       <span class="dot ${t.source}"></span>
       <span style="flex:1">${t.task}</span>
-      <button onclick="done(this,'${t.source}',${t.row})">Done</button>
+      <button class="done-btn"
+        onclick="done(this,'${t.source}',${t.row})">Done</button>
     `;
-    tasks.appendChild(c);
+    frag.appendChild(c);
   });
+  tasks.appendChild(frag);
 }
 
 function done(btn,source,row){
@@ -86,32 +91,34 @@ function done(btn,source,row){
 
 /* MY SPACE */
 async function loadSpace(){
-  const json = await fetch(
-    `${API}?action=mySpace&token=${token}`
-  ).then(r=>r.json());
+  const res = await fetch(`${API}?action=mySpace&token=${token}`);
+  const {items} = await res.json();
   space.innerHTML="";
 
-  if(!json.items.length){
-    space.innerHTML=`<div style="text-align:center;opacity:.6">
-      Yeh tumhari jagah hai 📁
+  if(!items.length){
+    space.innerHTML=`<div class="empty">
+      Yeh tumhari personal jagah hai 📁
     </div>`;
     return;
   }
 
-  json.items.forEach(i=>{
+  const frag=document.createDocumentFragment();
+  items.forEach(i=>{
     const c=document.createElement("div");
     c.className="chip";
     c.innerHTML=`
       <span class="dot space"></span>
       <span style="flex:1">${i.title}${i.value?" • "+i.value:""}</span>
-      <button onclick="remove(this,${i.row})">✕</button>
+      <button class="done-btn"
+        onclick="removeItem(this,${i.row})">✕</button>
     `;
-    space.appendChild(c);
+    frag.appendChild(c);
   });
+  space.appendChild(frag);
 }
 
 function addItem(){
-  if(currentView!=="space") return alert("System tasks sheet se aate hain 🙂");
+  if(currentView!=="space") return;
   const t=prompt("Title");
   if(!t) return;
 
@@ -124,7 +131,7 @@ function addItem(){
   }).then(loadSpace);
 }
 
-function remove(btn,row){
+function removeItem(btn,row){
   const chip=btn.closest(".chip");
   chip.classList.add("removing");
   setTimeout(()=>chip.remove(),180);
