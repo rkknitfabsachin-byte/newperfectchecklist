@@ -45,6 +45,21 @@ function switchView(view) {
   }
 }
 
+/* ================= THEME (SAFE STUB) ================= */
+
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  localStorage.setItem(
+    "rk-theme",
+    document.body.classList.contains("light") ? "light" : "dark"
+  );
+}
+
+// apply saved theme
+if (localStorage.getItem("rk-theme") === "light") {
+  document.body.classList.add("light");
+}
+
 /* ================= LOAD TASKS ================= */
 
 async function loadTasks() {
@@ -71,7 +86,7 @@ async function loadTasks() {
 
     if (!Array.isArray(data)) {
       console.error("API error:", data);
-      showMessage(data.error || "No tasks");
+      showMessage(data.error || "No tasks found");
       return;
     }
 
@@ -114,7 +129,7 @@ function renderTasks(list) {
   container.appendChild(frag);
 }
 
-/* ================= MY SPACE (SAFE PLACEHOLDER) ================= */
+/* ================= MY SPACE (SAFE STUB) ================= */
 
 function loadSpace() {
   const space = document.getElementById("space");
@@ -123,6 +138,12 @@ function loadSpace() {
       My Space coming soon 📁
     </div>
   `;
+}
+
+/* ================= ADD ITEM (SAFE STUB) ================= */
+
+function addItem() {
+  alert("My Space feature coming soon 📁");
 }
 
 /* ================= HELPERS ================= */
