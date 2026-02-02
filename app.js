@@ -7,14 +7,16 @@ let currentView = "tasks";
 /* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (!token) {
-    showMessage("Access link invalid ❌");
-    return;
-  }
-  loadTasks();
+  restoreTheme();
+  goToday();
 });
 
-/* ================= DATE NAV ================= */
+/* ================= DATE ================= */
+
+function updateDateLabel() {
+  document.getElementById("dateLabel").innerText =
+    currentDate.toDateString();
+}
 
 function moveDate(step) {
   currentDate.setDate(currentDate.getDate() + step);
@@ -31,21 +33,98 @@ function goToday() {
 function switchView(view) {
   currentView = view;
 
-  const tasksEl = document.getElementById("tasks");
-  const spaceEl = document.getElementById("space");
+  document.getElementById("tasks").classList.toggle("hidden", view !== "tasks");
+  document.getElementById("space").classList.toggle("hidden", view !== "space");
 
-  if (view === "tasks") {
-    tasksEl.classList.remove("hidden");
-    spaceEl.classList.add("hidden");
-    loadTasks();
+  document.getElementById("tabTasks").classList.toggle("active", view === "tasks");
+  document.getElementById("tabSpace").classList.toggle("active", view === "space");
+
+  if (view === "tasks") loadTasks();
+  else loadSpace();
+}
+
+/* ================= TASKS ================= */
+
+async function loadTasks() {
+  updateDateLabel();
+
+  const res = await fetch(
+    `${API}/tasks?token=${token}&date=${currentDate.toISOString()}`
+  );
+  const tasks = await res.json();
+
+  const box = document.getElementById("tasks");
+  box.innerHTML = "";
+
+  if (!tasks.length) {
+    box.innerHTML = `
+      <div class="empty">
+        Aaj koi task nahi 😌<br>
+        Kal phir hustle 💪
+      </div>`;
+    return;
+  }
+
+  tasks.forEach(task => {
+    const card = document.createElement("div");
+    card.className = `task-chip ${task.source}`;
+
+    card.innerHTML = `
+      <div class="task-left">
+        <div class="task-text">${task.task}</div>
+        <div class="task-meta">${task.source}</div>
+      </div>
+      <button class="done-btn" title="Mark as done">✓</button>
+    `;
+
+    card.querySelector(".done-btn").onclick = () =>
+      markDone(task, card);
+
+    box.appendChild(card);
+  });
+}
+
+/* ================= DONE ACTION ================= */
+
+async function markDone(task, el) {
+  // instant UI feedback
+  el.classList.add("swipe-out");
+
+  // backend call (already wired)
+  fetch(`${API}/done`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token,
+      source: task.source,
+      row: task.row
+    })
+  });
+
+  // remove from DOM
+  setTimeout(() => el.remove(), 250);
+}
+
+/* ================= MY SPACE ================= */
+
+function loadSpace() {
+  document.getElementById("space").innerHTML = `
+    <div class="empty">
+      My Space is personal 📁<br>
+      Links, habits & notes coming next ✨
+    </div>
+  `;
+}
+
+function addItem() {
+  if (currentView === "tasks") {
+    alert("Tasks are auto-managed 🙂");
   } else {
-    tasksEl.classList.add("hidden");
-    spaceEl.classList.remove("hidden");
-    loadSpace();
+    alert("Add item to My Space (next step)");
   }
 }
 
-/* ================= THEME (SAFE STUB) ================= */
+/* ================= THEME ================= */
 
 function toggleTheme() {
   document.body.classList.toggle("light");
@@ -55,100 +134,8 @@ function toggleTheme() {
   );
 }
 
-// apply saved theme
-if (localStorage.getItem("rk-theme") === "light") {
-  document.body.classList.add("light");
-}
-
-/* ================= LOAD TASKS ================= */
-
-async function loadTasks() {
-  const container = document.getElementById("tasks");
-  const dateLabel = document.getElementById("dateLabel");
-
-  container.innerHTML = "";
-  dateLabel.innerText = currentDate.toDateString();
-
-  const url = `${API}/tasks?token=${token}&date=${currentDate.toISOString()}`;
-
-  try {
-    const res = await fetch(url);
-    const text = await res.text();
-
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.error("Invalid JSON:", text);
-      showMessage("Server error ❌");
-      return;
-    }
-
-    if (!Array.isArray(data)) {
-      console.error("API error:", data);
-      showMessage(data.error || "No tasks found");
-      return;
-    }
-
-    renderTasks(data);
-
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    showMessage("Network error ❌");
+function restoreTheme() {
+  if (localStorage.getItem("rk-theme") === "light") {
+    document.body.classList.add("light");
   }
-}
-
-/* ================= RENDER TASKS ================= */
-
-function renderTasks(list) {
-  const container = document.getElementById("tasks");
-  container.innerHTML = "";
-
-  if (list.length === 0) {
-    container.innerHTML = `
-      <div class="empty">
-        Aaj ka kaam complete 🎉<br>
-        Thoda relax kar lo 😌
-      </div>
-    `;
-    return;
-  }
-
-  const frag = document.createDocumentFragment();
-
-  list.forEach(t => {
-    const div = document.createElement("div");
-    div.className = "chip";
-    div.innerHTML = `
-      <span class="dot ${t.source}"></span>
-      <span style="flex:1">${t.task}</span>
-    `;
-    frag.appendChild(div);
-  });
-
-  container.appendChild(frag);
-}
-
-/* ================= MY SPACE (SAFE STUB) ================= */
-
-function loadSpace() {
-  const space = document.getElementById("space");
-  space.innerHTML = `
-    <div class="empty">
-      My Space coming soon 📁
-    </div>
-  `;
-}
-
-/* ================= ADD ITEM (SAFE STUB) ================= */
-
-function addItem() {
-  alert("My Space feature coming soon 📁");
-}
-
-/* ================= HELPERS ================= */
-
-function showMessage(msg) {
-  document.getElementById("tasks").innerHTML =
-    `<div class="empty">${msg}</div>`;
 }
