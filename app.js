@@ -78,13 +78,14 @@ async function markDone(task, el) {
   form.append("source", task.source);
   form.append("row", task.row);
 
-  await fetch(DONE_API, {
+  await fetch(`${API}/done`, {
     method: "POST",
-    body: form   // 🔑 NO headers, NO JSON
+    body: form
   });
 
   setTimeout(() => el.remove(), 250);
 }
+
 
 
 /* MY SPACE */
