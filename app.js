@@ -86,12 +86,12 @@ async function loadTasks() {
 
 /* ================= DONE ACTION ================= */
 
+const DONE_API = "https://script.google.com/macros/s/AKfycbxIWgtBmEKAorE8IHDtXGhLuJsunw2kIUAvcTj7J0IDrz-oUoNXLoJ__KYNgtFVT4RN/exec";
+
 async function markDone(task, el) {
-  // instant UI feedback
   el.classList.add("swipe-out");
 
-  // backend call (already wired)
-  fetch(`${API}/done`, {
+  await fetch(DONE_API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -100,6 +100,10 @@ async function markDone(task, el) {
       row: task.row
     })
   });
+
+  setTimeout(() => el.remove(), 250);
+}
+
 
   // remove from DOM
   setTimeout(() => el.remove(), 250);
