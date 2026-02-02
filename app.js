@@ -73,18 +73,19 @@ async function loadTasks() {
 async function markDone(task, el) {
   el.classList.add("swipe-out");
 
+  const form = new URLSearchParams();
+  form.append("token", token);
+  form.append("source", task.source);
+  form.append("row", task.row);
+
   await fetch(DONE_API, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token,
-      source: task.source,
-      row: task.row
-    })
+    body: form   // 🔑 NO headers, NO JSON
   });
 
   setTimeout(() => el.remove(), 250);
 }
+
 
 /* MY SPACE */
 function loadSpace() {
