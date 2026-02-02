@@ -1,53 +1,50 @@
 const API = "https://newchecklist.rkknitfabsachin.workers.dev";
+const DONE_API = "https://script.google.com/macros/s/AKfycbxIWgtBmEKAorE8IHDtXGhLuJsunw2kIUAvcTj7J0IDrz-oUoNXLoJ__KYNgtFVT4RN/exec";
+
 const token = new URLSearchParams(location.search).get("token");
+if (!token) {
+  document.body.innerHTML = `
+    <div style="padding:40px;text-align:center">
+      ❌ Invalid link<br><br>
+      Please use your personal task link.
+    </div>`;
+  throw new Error("Missing token");
+}
 
 let currentDate = new Date();
 let currentView = "tasks";
-
-/* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
   restoreTheme();
   goToday();
 });
 
-/* ================= DATE ================= */
-
+/* DATE */
 function updateDateLabel() {
-  document.getElementById("dateLabel").innerText =
-    currentDate.toDateString();
+  document.getElementById("dateLabel").innerText = currentDate.toDateString();
 }
-
 function moveDate(step) {
   currentDate.setDate(currentDate.getDate() + step);
   if (currentView === "tasks") loadTasks();
 }
-
 function goToday() {
   currentDate = new Date();
   if (currentView === "tasks") loadTasks();
 }
 
-/* ================= VIEW SWITCH ================= */
-
-function switchView(view) {
-  currentView = view;
-
-  document.getElementById("tasks").classList.toggle("hidden", view !== "tasks");
-  document.getElementById("space").classList.toggle("hidden", view !== "space");
-
-  document.getElementById("tabTasks").classList.toggle("active", view === "tasks");
-  document.getElementById("tabSpace").classList.toggle("active", view === "space");
-
-  if (view === "tasks") loadTasks();
-  else loadSpace();
+/* VIEW */
+function switchView(v) {
+  currentView = v;
+  document.getElementById("tasks").classList.toggle("hidden", v !== "tasks");
+  document.getElementById("space").classList.toggle("hidden", v !== "space");
+  document.getElementById("tabTasks").classList.toggle("active", v === "tasks");
+  document.getElementById("tabSpace").classList.toggle("active", v === "space");
+  v === "tasks" ? loadTasks() : loadSpace();
 }
 
-/* ================= TASKS ================= */
-
+/* TASKS */
 async function loadTasks() {
   updateDateLabel();
-
   const res = await fetch(
     `${API}/tasks?token=${token}&date=${currentDate.toISOString()}`
   );
@@ -57,36 +54,21 @@ async function loadTasks() {
   box.innerHTML = "";
 
   if (!tasks.length) {
-    box.innerHTML = `
-      <div class="empty">
-        Aaj koi task nahi 😌<br>
-        Kal phir hustle 💪
-      </div>`;
+    box.innerHTML = `<div class="empty">Aaj koi task nahi 😌</div>`;
     return;
   }
 
-  tasks.forEach(task => {
+  tasks.forEach(t => {
     const card = document.createElement("div");
-    card.className = `task-chip ${task.source}`;
-
+    card.className = `task-chip ${t.source}`;
     card.innerHTML = `
-      <div class="task-left">
-        <div class="task-text">${task.task}</div>
-        <div class="task-meta">${task.source}</div>
-      </div>
-      <button class="done-btn" title="Mark as done">✓</button>
+      <div class="task-text">${t.task}</div>
+      <button class="done-btn">✓</button>
     `;
-
-    card.querySelector(".done-btn").onclick = () =>
-      markDone(task, card);
-
+    card.querySelector("button").onclick = () => markDone(t, card);
     box.appendChild(card);
   });
 }
-
-/* ================= DONE ACTION ================= */
-
-const DONE_API = "https://script.google.com/macros/s/AKfycbxIWgtBmEKAorE8IHDtXGhLuJsunw2kIUAvcTj7J0IDrz-oUoNXLoJ__KYNgtFVT4RN/exec";
 
 async function markDone(task, el) {
   el.classList.add("swipe-out");
@@ -104,40 +86,21 @@ async function markDone(task, el) {
   setTimeout(() => el.remove(), 250);
 }
 
-
-  // remove from DOM
-  setTimeout(() => el.remove(), 250);
-}
-
-/* ================= MY SPACE ================= */
-
+/* MY SPACE */
 function loadSpace() {
-  document.getElementById("space").innerHTML = `
-    <div class="empty">
-      My Space is personal 📁<br>
-      Links, habits & notes coming next ✨
-    </div>
-  `;
+  document.getElementById("space").innerHTML =
+    `<div class="empty">My Space coming soon 📁</div>`;
 }
-
 function addItem() {
-  if (currentView === "tasks") {
-    alert("Tasks are auto-managed 🙂");
-  } else {
-    alert("Add item to My Space (next step)");
-  }
+  alert("My Space editor coming next");
 }
 
-/* ================= THEME ================= */
-
+/* THEME */
 function toggleTheme() {
   document.body.classList.toggle("light");
-  localStorage.setItem(
-    "rk-theme",
-    document.body.classList.contains("light") ? "light" : "dark"
-  );
+  localStorage.setItem("rk-theme",
+    document.body.classList.contains("light") ? "light" : "dark");
 }
-
 function restoreTheme() {
   if (localStorage.getItem("rk-theme") === "light") {
     document.body.classList.add("light");
