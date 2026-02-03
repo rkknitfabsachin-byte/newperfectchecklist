@@ -74,6 +74,7 @@ async function markDone(task, el) {
   el.classList.add("swipe-out");
 
   const form = new URLSearchParams();
+  form.append("action", "done");   // 🔑 THIS WAS MISSING
   form.append("token", token);
   form.append("source", task.source);
   form.append("row", task.row);
