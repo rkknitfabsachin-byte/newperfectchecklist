@@ -108,3 +108,87 @@ function restoreTheme() {
     document.body.classList.add("light");
   }
 }
+let mySpaceData = [];
+let currentFolder = "General";
+
+async function loadSpace() {
+  const box = document.getElementById("space");
+  box.innerHTML = "<div class='empty'>Loading...</div>";
+
+  const form = new URLSearchParams();
+  form.append("action", "getSpace");
+  form.append("token", token);
+
+  const res = await fetch(`${API}/myspace`, {
+    method: "POST",
+    body: form
+  });
+
+  mySpaceData = await res.json();
+  renderFolders();
+}
+
+function renderFolders() {
+  const box = document.getElementById("space");
+  box.innerHTML = "";
+
+  const folders = [...new Set(mySpaceData.map(r => r[2] || "General"))];
+
+  if (!folders.length) {
+    box.innerHTML = `<div class="empty">Folder banao 📁</div>`;
+    return;
+  }
+
+  folders.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "task-chip";
+    div.innerText = "📁 " + f;
+    div.onclick = () => openFolder(f);
+    box.appendChild(div);
+  });
+}
+
+function openFolder(folder) {
+  currentFolder = folder;
+  const box = document.getElementById("space");
+  box.innerHTML = "";
+
+  const back = document.createElement("div");
+  back.className = "task-chip";
+  back.innerText = "← Back";
+  back.onclick = renderFolders;
+  box.appendChild(back);
+
+  mySpaceData
+    .filter(r => (r[2] || "General") === folder)
+    .forEach(r => {
+      const div = document.createElement("div");
+      div.className = "task-chip";
+      div.innerHTML = `
+        <div class="task-text">${r[3]}</div>
+        ${r[4] ? `<a href="${r[4]}" target="_blank">Open</a>` : ""}
+      `;
+      box.appendChild(div);
+    });
+}
+
+const _addItem = addItem;
+addItem = function () {
+  if (currentView !== "space") return _addItem();
+
+  const isFolder = confirm("Create folder?");
+  let title = prompt(isFolder ? "Folder name" : "Item title");
+  if (!title) return;
+
+  const form = new URLSearchParams();
+  form.append("action", "addSpace");
+  form.append("token", token);
+  form.append("type", isFolder ? "folder" : "task");
+  form.append("folder", isFolder ? title : currentFolder);
+  form.append("title", title);
+
+  fetch(`${API}/myspace`, {
+    method: "POST",
+    body: form
+  }).then(loadSpace);
+};
