@@ -1,89 +1,114 @@
 const API = "https://newchecklist.rkknitfabsachin.workers.dev";
 const token = new URLSearchParams(location.search).get("token");
 
+const tasksView = document.getElementById("tasksView");
+const spaceView = document.getElementById("spaceView");
+const dateLabel = document.getElementById("dateLabel");
+
 let currentDate = new Date();
-let currentView = "tasks";
+let view = "tasks";
 
 /* INIT */
 document.addEventListener("DOMContentLoaded", () => {
-  goToday();
+  restoreTheme();
+  bindUI();
+  renderDate();
+  loadTasks();
 });
 
-/* DATE */
-function goToday() {
-  currentDate = new Date();
-  loadTasks();
+/* UI */
+function bindUI() {
+  document.getElementById("tabTasks").onclick = () => switchView("tasks");
+  document.getElementById("tabSpace").onclick = () => switchView("space");
+  document.getElementById("themeToggle").onclick = toggleTheme;
 }
 
-function moveDate(step) {
-  currentDate.setDate(currentDate.getDate() + step);
-  loadTasks();
-}
-
-/* VIEW */
 function switchView(v) {
-  currentView = v;
-  document.getElementById("tasks").classList.toggle("hidden", v !== "tasks");
-  document.getElementById("space").classList.toggle("hidden", v !== "space");
-  if (v === "tasks") loadTasks();
+  view = v;
+  tasksView.classList.toggle("hidden", v !== "tasks");
+  spaceView.classList.toggle("hidden", v !== "space");
+  document.getElementById("tabTasks").classList.toggle("active", v === "tasks");
+  document.getElementById("tabSpace").classList.toggle("active", v === "space");
+
+  v === "tasks" ? loadTasks() : loadSpace();
+}
+
+/* DATE */
+function renderDate() {
+  dateLabel.innerText = currentDate.toDateString();
 }
 
 /* TASKS */
 async function loadTasks() {
-  const box = document.getElementById("tasks");
-  box.innerHTML = "";
+  tasksView.innerHTML = "";
 
-  await loadTaskStats();
+  const stats = await getStats();
+  tasksView.appendChild(stats);
 
   const res = await fetch(
     `${API}/tasks?token=${token}&date=${currentDate.toISOString()}`
   );
-  const tasks = await res.json();
+  const data = await res.json();
 
-  if (!tasks.length) {
-    box.innerHTML += `<div class="empty">Aaj koi task nahi 😌</div>`;
+  if (!data.length) {
+    tasksView.innerHTML += `<div class="card">No tasks today 🌱</div>`;
     return;
   }
 
-  tasks.forEach(t => {
+  data.forEach(t => {
     const div = document.createElement("div");
-    div.className = "task-chip " + t.source;
+    div.className = "card task";
     div.innerHTML = `
       <div>${t.task}</div>
-      <button onclick="markDone('${t.source}',${t.row},this)">✓</button>
+      <button>Done</button>
     `;
-    box.appendChild(div);
+    div.querySelector("button").onclick = () => markDone(t, div);
+    tasksView.appendChild(div);
   });
 }
 
-async function markDone(source, row, btn) {
-  const form = new URLSearchParams();
-  form.append("action", "done");
-  form.append("token", token);
-  form.append("source", source);
-  form.append("row", row);
+async function markDone(task, el) {
+  el.style.opacity = "0.4";
+
+  const form = new URLSearchParams({
+    action: "done",
+    token,
+    source: task.source,
+    row: task.row
+  });
 
   await fetch(`${API}/done`, { method: "POST", body: form });
-  btn.parentElement.remove();
+  el.remove();
 }
 
-/* STATS CARD */
-async function loadTaskStats() {
-  const form = new URLSearchParams();
-  form.append("action", "getTaskStats");
-  form.append("token", token);
-
-  const res = await fetch(`${API}/myspace`, {
-    method: "POST",
-    body: form
-  });
-
+/* STATS */
+async function getStats() {
+  const form = new URLSearchParams({ action: "getTaskStats", token });
+  const res = await fetch(`${API}/myspace`, { method: "POST", body: form });
   const s = await res.json();
-  document.getElementById("tasks").innerHTML = `
-    <div class="task-chip">
-      🔥 Streak: ${s.streak} |
-      📅 Week: ${s.weekly} |
-      📊 Month: ${s.monthly}
-    </div>
+
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `
+    🔥 Streak: ${s.streak}<br>
+    📅 Week: ${s.weekly} &nbsp; 📊 Month: ${s.monthly}
   `;
+  return div;
+}
+
+/* MY SPACE (UNCHANGED BASIC VIEW) */
+async function loadSpace() {
+  spaceView.innerHTML = `<div class="card">My Space is safe 🌱</div>`;
+}
+
+/* THEME */
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  localStorage.setItem("rkTheme", document.body.classList.contains("light"));
+}
+
+function restoreTheme() {
+  if (localStorage.getItem("rkTheme") === "true") {
+    document.body.classList.add("light");
+  }
 }
