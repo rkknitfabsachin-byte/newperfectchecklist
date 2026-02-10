@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RK Knit Fab</title>
+  <title>RK Knit Fab – Tasks</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header class="topbar">
+<header class="appbar">
   <div class="brand">
     <div class="logo">RK Knit Fab</div>
-    <div id="dateLabel" class="date"></div>
+    <div id="dateLabel" class="subtitle"></div>
   </div>
 
-  <div class="controls">
+  <div class="actions">
     <div class="segmented">
       <button id="tabTasks" class="active">Tasks</button>
       <button id="tabSpace">My Space</button>
@@ -24,8 +24,14 @@
 </header>
 
 <main>
-  <section id="tasksView"></section>
-  <section id="spaceView" class="hidden"></section>
+  <!-- KPI ROW -->
+  <section id="kpiRow" class="kpi-row"></section>
+
+  <!-- TASKS -->
+  <section id="tasksView" class="grid"></section>
+
+  <!-- MY SPACE -->
+  <section id="spaceView" class="grid hidden"></section>
 </main>
 
 <button id="fab">＋</button>
