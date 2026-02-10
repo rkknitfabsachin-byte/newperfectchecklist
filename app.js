@@ -5,9 +5,12 @@ const tasksView = document.getElementById("tasksView");
 const spaceView = document.getElementById("spaceView");
 const kpiRow = document.getElementById("kpiRow");
 const dateLabel = document.getElementById("dateLabel");
+const fab = document.getElementById("fab");
 
 let view = "tasks";
 let currentDate = new Date();
+let mySpaceData = [];
+let currentFolder = null;
 
 /* INIT */
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,6 +25,7 @@ function bindUI() {
   tabTasks.onclick = () => switchView("tasks");
   tabSpace.onclick = () => switchView("space");
   themeToggle.onclick = toggleTheme;
+  fab.onclick = onFabClick;
 }
 
 function switchView(v) {
@@ -41,7 +45,8 @@ function updateDate() {
   dateLabel.textContent = currentDate.toDateString();
 }
 
-/* TASKS */
+/* ================= TASKS ================= */
+
 async function loadTasks() {
   tasksView.innerHTML = "";
   kpiRow.innerHTML = "";
@@ -62,7 +67,7 @@ async function loadTasks() {
     const card = document.createElement("div");
     card.className = `card ${t.source}`;
     card.innerHTML = `
-      <div class="title">${t.task}</div>
+      <div>${t.task}</div>
       <button>Done</button>
     `;
     card.querySelector("button").onclick = () => markDone(t, card);
@@ -84,40 +89,93 @@ async function markDone(task, card) {
 
 /* KPI */
 async function loadKPIs() {
-  const form = new URLSearchParams({
-    action: "getTaskStats",
-    token
-  });
-
-  const res = await fetch(`${API}/myspace`, {
-    method: "POST",
-    body: form
-  });
+  const form = new URLSearchParams({ action: "getTaskStats", token });
+  const res = await fetch(`${API}/myspace`, { method: "POST", body: form });
   const s = await res.json();
 
   kpiRow.innerHTML = `
-    <div class="kpi">
-      <div class="label">Streak</div>
-      <div class="value">${s.streak}</div>
-    </div>
-    <div class="kpi">
-      <div class="label">This Week</div>
-      <div class="value">${s.weekly}</div>
-    </div>
-    <div class="kpi">
-      <div class="label">This Month</div>
-      <div class="value">${s.monthly}</div>
-    </div>
+    <div class="kpi"><div class="label">Streak</div><div class="value">${s.streak}</div></div>
+    <div class="kpi"><div class="label">This Week</div><div class="value">${s.weekly}</div></div>
+    <div class="kpi"><div class="label">This Month</div><div class="value">${s.monthly}</div></div>
   `;
 }
 
-/* MY SPACE (SAFE PLACEHOLDER) */
-function loadSpace() {
-  spaceView.innerHTML = `
-    <div class="card">
-      My Space is your calm storage 🌱
-    </div>
-  `;
+/* ================= MY SPACE ================= */
+
+async function loadSpace() {
+  kpiRow.innerHTML = "";
+  spaceView.innerHTML = "";
+  currentFolder = null;
+
+  const form = new URLSearchParams({ action: "getSpace", token });
+  const res = await fetch(`${API}/myspace`, { method: "POST", body: form });
+  mySpaceData = await res.json();
+
+  renderFolders();
+}
+
+function renderFolders() {
+  spaceView.innerHTML = "";
+
+  const folders = [...new Set(mySpaceData.map(r => r[2] || "General"))];
+
+  if (!folders.length) {
+    spaceView.innerHTML = `<div class="card">Create your first folder 📁</div>`;
+    return;
+  }
+
+  folders.forEach(f => {
+    const card = document.createElement("div");
+    card.className = "card folder";
+    card.innerHTML = `📁 ${f}`;
+    card.onclick = () => openFolder(f);
+    spaceView.appendChild(card);
+  });
+}
+
+function openFolder(folder) {
+  currentFolder = folder;
+  spaceView.innerHTML = "";
+
+  const back = document.createElement("div");
+  back.className = "card folder";
+  back.textContent = "← Back to folders";
+  back.onclick = renderFolders;
+  spaceView.appendChild(back);
+
+  mySpaceData
+    .filter(r => (r[2] || "General") === folder)
+    .forEach(r => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div>${r[3]}</div>
+        ${r[4] ? `<a href="${r[4]}" target="_blank">Open</a>` : ""}
+      `;
+      spaceView.appendChild(card);
+    });
+}
+
+/* FAB */
+function onFabClick() {
+  if (view !== "space") return;
+
+  const isFolder = confirm("Create folder?");
+  const title = prompt(isFolder ? "Folder name" : "Item title");
+  if (!title) return;
+
+  const url = isFolder ? "" : prompt("Link (optional)") || "";
+
+  const form = new URLSearchParams({
+    action: "addSpace",
+    token,
+    type: isFolder ? "folder" : (url ? "link" : "task"),
+    folder: isFolder ? title : (currentFolder || "General"),
+    title,
+    url
+  });
+
+  fetch(`${API}/myspace`, { method: "POST", body: form }).then(loadSpace);
 }
 
 /* THEME */
