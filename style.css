@@ -4,7 +4,7 @@
   --text: #e8edf2;
   --muted: #9aa4b2;
   --accent: #4ade80;
-  --danger: #f87171;
+  --blue: #60a5fa;
   --radius: 16px;
 }
 
@@ -19,7 +19,7 @@ body.light {
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -36,15 +36,8 @@ body {
   align-items: center;
 }
 
-.logo {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.subtitle {
-  font-size: 12px;
-  color: var(--muted);
-}
+.logo { font-weight: 700; }
+.subtitle { font-size: 12px; color: var(--muted); }
 
 /* CONTROLS */
 .actions {
@@ -100,9 +93,7 @@ body.light .theme-toggle::after {
 }
 
 /* MAIN */
-main {
-  padding: 16px;
-}
+main { padding: 16px; }
 
 /* KPI */
 .kpi-row {
@@ -118,16 +109,8 @@ main {
   padding: 14px;
 }
 
-.kpi .label {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.kpi .value {
-  font-size: 22px;
-  font-weight: 700;
-  margin-top: 4px;
-}
+.kpi .label { font-size: 12px; color: var(--muted); }
+.kpi .value { font-size: 22px; font-weight: 700; }
 
 /* GRID */
 .grid {
@@ -146,18 +129,17 @@ main {
 }
 
 .card.checklist { border-left: 4px solid var(--accent); }
-.card.delegation { border-left: 4px solid #60a5fa; }
+.card.delegation { border-left: 4px solid var(--blue); }
 
-.card .title {
-  font-size: 14px;
+.card.folder {
+  justify-content: flex-start;
+  gap: 10px;
+  cursor: pointer;
 }
 
-.card button {
-  background: var(--accent);
-  border: none;
-  border-radius: 10px;
-  padding: 6px 12px;
-  cursor: pointer;
+.card a {
+  color: var(--accent);
+  text-decoration: none;
 }
 
 /* FAB */
@@ -174,5 +156,4 @@ main {
   color: #062b17;
 }
 
-/* HELPERS */
 .hidden { display: none; }
