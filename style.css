@@ -1,58 +1,67 @@
 :root {
-  --bg: #0e1511;
-  --card: rgba(255,255,255,0.06);
-  --text: #e9f5ef;
-  --muted: #9fb6ad;
+  --bg: #0b0f14;
+  --card: #141a22;
+  --text: #e8edf2;
+  --muted: #9aa4b2;
   --accent: #4ade80;
+  --danger: #f87171;
+  --radius: 16px;
 }
 
 body.light {
-  --bg: #f5f7f6;
+  --bg: #f4f6f8;
   --card: #ffffff;
-  --text: #0e1511;
-  --muted: #6b7d75;
+  --text: #0b0f14;
+  --muted: #6b7280;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
 
-.topbar {
+/* APP BAR */
+.appbar {
   position: sticky;
   top: 0;
+  z-index: 10;
+  padding: 14px 16px;
   background: var(--bg);
-  padding: 12px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 10;
 }
 
 .logo {
   font-weight: 700;
+  font-size: 16px;
 }
 
-.date {
+.subtitle {
   font-size: 12px;
   color: var(--muted);
+}
+
+/* CONTROLS */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .segmented {
   display: flex;
   background: var(--card);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .segmented button {
+  background: none;
   border: none;
-  background: transparent;
   color: var(--muted);
   padding: 6px 12px;
   cursor: pointer;
@@ -60,18 +69,18 @@ body {
 
 .segmented button.active {
   background: var(--accent);
-  color: #022c22;
-  border-radius: 8px;
+  color: #062b17;
+  border-radius: 10px;
 }
 
+/* THEME TOGGLE */
 .theme-toggle {
-  width: 40px;
+  width: 42px;
   height: 22px;
-  border-radius: 20px;
   background: var(--card);
-  margin-left: 8px;
-  cursor: pointer;
+  border-radius: 20px;
   position: relative;
+  cursor: pointer;
 }
 
 .theme-toggle::after {
@@ -87,53 +96,83 @@ body {
 }
 
 body.light .theme-toggle::after {
-  left: 20px;
+  left: 22px;
 }
 
+/* MAIN */
 main {
+  padding: 16px;
+}
+
+/* KPI */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi {
+  background: var(--card);
+  border-radius: var(--radius);
   padding: 14px;
 }
 
+.kpi .label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.kpi .value {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+/* CARD */
 .card {
   background: var(--card);
-  border-radius: 14px;
+  border-radius: var(--radius);
   padding: 14px;
-  margin-bottom: 12px;
-  animation: fadeIn 0.25s ease;
-}
-
-.task {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.task button {
+.card.checklist { border-left: 4px solid var(--accent); }
+.card.delegation { border-left: 4px solid #60a5fa; }
+
+.card .title {
+  font-size: 14px;
+}
+
+.card button {
   background: var(--accent);
   border: none;
-  border-radius: 8px;
-  padding: 6px 10px;
+  border-radius: 10px;
+  padding: 6px 12px;
   cursor: pointer;
 }
 
-.hidden {
-  display: none;
-}
-
+/* FAB */
 #fab {
   position: fixed;
-  bottom: 20px;
   right: 20px;
-  background: var(--accent);
-  border: none;
-  border-radius: 50%;
+  bottom: 20px;
   width: 56px;
   height: 56px;
-  font-size: 28px;
-  color: #022c22;
+  border-radius: 50%;
+  border: none;
+  font-size: 26px;
+  background: var(--accent);
+  color: #062b17;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
+/* HELPERS */
+.hidden { display: none; }
