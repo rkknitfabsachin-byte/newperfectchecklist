@@ -3,73 +3,74 @@ const token = new URLSearchParams(location.search).get("token");
 
 const tasksView = document.getElementById("tasksView");
 const spaceView = document.getElementById("spaceView");
+const kpiRow = document.getElementById("kpiRow");
 const dateLabel = document.getElementById("dateLabel");
 
-let currentDate = new Date();
 let view = "tasks";
+let currentDate = new Date();
 
 /* INIT */
 document.addEventListener("DOMContentLoaded", () => {
   restoreTheme();
   bindUI();
-  renderDate();
+  updateDate();
   loadTasks();
 });
 
 /* UI */
 function bindUI() {
-  document.getElementById("tabTasks").onclick = () => switchView("tasks");
-  document.getElementById("tabSpace").onclick = () => switchView("space");
-  document.getElementById("themeToggle").onclick = toggleTheme;
+  tabTasks.onclick = () => switchView("tasks");
+  tabSpace.onclick = () => switchView("space");
+  themeToggle.onclick = toggleTheme;
 }
 
 function switchView(v) {
   view = v;
   tasksView.classList.toggle("hidden", v !== "tasks");
   spaceView.classList.toggle("hidden", v !== "space");
-  document.getElementById("tabTasks").classList.toggle("active", v === "tasks");
-  document.getElementById("tabSpace").classList.toggle("active", v === "space");
+  kpiRow.classList.toggle("hidden", v !== "tasks");
+
+  tabTasks.classList.toggle("active", v === "tasks");
+  tabSpace.classList.toggle("active", v === "space");
 
   v === "tasks" ? loadTasks() : loadSpace();
 }
 
 /* DATE */
-function renderDate() {
-  dateLabel.innerText = currentDate.toDateString();
+function updateDate() {
+  dateLabel.textContent = currentDate.toDateString();
 }
 
 /* TASKS */
 async function loadTasks() {
   tasksView.innerHTML = "";
+  kpiRow.innerHTML = "";
 
-  const stats = await getStats();
-  tasksView.appendChild(stats);
+  await loadKPIs();
 
   const res = await fetch(
     `${API}/tasks?token=${token}&date=${currentDate.toISOString()}`
   );
-  const data = await res.json();
+  const tasks = await res.json();
 
-  if (!data.length) {
-    tasksView.innerHTML += `<div class="card">No tasks today 🌱</div>`;
+  if (!tasks.length) {
+    tasksView.innerHTML = `<div class="card">No tasks today 🌱</div>`;
     return;
   }
 
-  data.forEach(t => {
-    const div = document.createElement("div");
-    div.className = "card task";
-    div.innerHTML = `
-      <div>${t.task}</div>
+  tasks.forEach(t => {
+    const card = document.createElement("div");
+    card.className = `card ${t.source}`;
+    card.innerHTML = `
+      <div class="title">${t.task}</div>
       <button>Done</button>
     `;
-    div.querySelector("button").onclick = () => markDone(t, div);
-    tasksView.appendChild(div);
+    card.querySelector("button").onclick = () => markDone(t, card);
+    tasksView.appendChild(card);
   });
 }
 
-async function markDone(task, el) {
-  el.style.opacity = "0.4";
-
+async function markDone(task, card) {
   const form = new URLSearchParams({
     action: "done",
     token,
@@ -78,27 +79,45 @@ async function markDone(task, el) {
   });
 
   await fetch(`${API}/done`, { method: "POST", body: form });
-  el.remove();
+  card.remove();
 }
 
-/* STATS */
-async function getStats() {
-  const form = new URLSearchParams({ action: "getTaskStats", token });
-  const res = await fetch(`${API}/myspace`, { method: "POST", body: form });
+/* KPI */
+async function loadKPIs() {
+  const form = new URLSearchParams({
+    action: "getTaskStats",
+    token
+  });
+
+  const res = await fetch(`${API}/myspace`, {
+    method: "POST",
+    body: form
+  });
   const s = await res.json();
 
-  const div = document.createElement("div");
-  div.className = "card";
-  div.innerHTML = `
-    🔥 Streak: ${s.streak}<br>
-    📅 Week: ${s.weekly} &nbsp; 📊 Month: ${s.monthly}
+  kpiRow.innerHTML = `
+    <div class="kpi">
+      <div class="label">Streak</div>
+      <div class="value">${s.streak}</div>
+    </div>
+    <div class="kpi">
+      <div class="label">This Week</div>
+      <div class="value">${s.weekly}</div>
+    </div>
+    <div class="kpi">
+      <div class="label">This Month</div>
+      <div class="value">${s.monthly}</div>
+    </div>
   `;
-  return div;
 }
 
-/* MY SPACE (UNCHANGED BASIC VIEW) */
-async function loadSpace() {
-  spaceView.innerHTML = `<div class="card">My Space is safe 🌱</div>`;
+/* MY SPACE (SAFE PLACEHOLDER) */
+function loadSpace() {
+  spaceView.innerHTML = `
+    <div class="card">
+      My Space is your calm storage 🌱
+    </div>
+  `;
 }
 
 /* THEME */
