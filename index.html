@@ -1,43 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RK Knit Fab</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RK Knit Fab</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header class="header">
-  <div class="left">
-    <div class="brand">RK Knit Fab</div>
-    <div id="dateLabel" class="sub"></div>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">RK Knit Fab</div>
+    <div id="dateLabel" class="date"></div>
   </div>
 
-  <div class="center">
-    <button onclick="moveDate(-1)">◀</button>
-    <button onclick="goToday()">Today</button>
-    <button onclick="moveDate(1)">▶</button>
-  </div>
-
-  <div class="right">
+  <div class="controls">
     <div class="segmented">
-      <button id="tabTasks" class="active" onclick="switchView('tasks')">Tasks</button>
-      <button id="tabSpace" onclick="switchView('space')">My Space</button>
+      <button id="tabTasks" class="active">Tasks</button>
+      <button id="tabSpace">My Space</button>
     </div>
-
-    <div class="theme-toggle" onclick="toggleTheme()">
-      <span></span>
-    </div>
+    <div id="themeToggle" class="theme-toggle"></div>
   </div>
 </header>
 
 <main>
-  <section id="tasks"></section>
-  <section id="space" class="hidden"></section>
+  <section id="tasksView"></section>
+  <section id="spaceView" class="hidden"></section>
 </main>
 
-<button class="fab" onclick="addItem()">＋</button>
+<button id="fab">＋</button>
 
 <script src="app.js"></script>
 </body>
